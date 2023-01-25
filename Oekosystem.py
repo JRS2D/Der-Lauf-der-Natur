@@ -1,138 +1,259 @@
 __author__ = "7714256 Laterza"
 
-class Lebewesen:
+import random
+
+class Creature:
 	def __init__(self, population):
 		if population > 1:
 			self.population = population
 
 
-class Pflanze(Lebewesen):
-	def __init__(self, population, groesse, minimale_groesse, maximale_groesse, habitat):
-		self.habitat = habitat
-		self.groesse = groesse
-		self.minimale_groesse = minimale_groesse
-		self.maximale_groesse = maximale_groesse
+class Plant(Creature):
+	def __init__(self, name, type, population, size, minimal_size, maximal_size):
+		self.name = name
+		self.type = type
+		self.size = size
+		self.minimal_size = minimal_size
+		self.maximal_size = maximal_size
 		super().__init__(population)
 
 
-	def sterben(groesse):
+	def death(size):
 		return 0
 
 
-class Baum(Pflanze):
-	def __init__(self, population, groesse, minimale_groesse, maximale_groesse, habitat, hoehe, blaetter, fruechte):
-		self.hoehe = hoehe
-		self.blaetter = blaetter
-		self.fruechte = fruechte
-		super().__init__(population, groesse, minimale_groesse, maximale_groesse, habitat)
+class Tree(Plant):
+	def __init__(self, name, population, size, minimal_size, maximal_size, height, leaves, fruit):
+		self.height = height
+		self.leaves = leaves
+		self.fruit = fruit
+		super().__init__(name, "Baum", population, size, minimal_size, maximal_size)
 
 
-	def vermehren(population, fruechte):
+	def multiply(population, fruit):
 		pass
 
 
-class Pilz(Pflanze):
-	def __init__(self, population, groesse, minimale_groesse, maximale_groesse, habitat, sprossen):
-		self.sprossen = sprossen
-		super().__init__(population, groesse, minimale_groesse, maximale_groesse, habitat)
+class Mushroom(Plant):
+	def __init__(self, name, population, size, minimal_size, maximal_size, spore):
+		self.spore = spore
+		super().__init__(name, "Pilz", population, size, minimal_size, maximal_size)
 
 
-	def vermehren(population):
+	def multiply(population):
 		pass
 
 
-class Strauch(Pflanze):
-	def __init__(self, population, groesse, minimale_groesse, maximale_groesse, habitat, beeren):
-		self.beeren = beeren
-		super().__init__(population, groesse, minimale_groesse, maximale_groesse, habitat)
+class Shrub(Plant):
+	def __init__(self, name, population, size, minimal_size, maximal_size, berries):
+		self.berries = berries
+		super().__init__(name, "Strauch", population, size, minimal_size, maximal_size)
 
 
-class Tier(Lebewesen):
-	def __init__(self, population, alter, hunger, gesundheit, habitat):
-		self.habitat = habitat
-		self.alter = alter
+class Animal(Creature):
+	def __init__(self, name, population, age, hunger, health):
+		self.name = name
+		self.age = age
 		self.hunger = hunger
-		self.gesundheit = gesundheit
+		self.health = health
 		super().__init__(population)
 
 
-	def fressen(self, hunger_gedeckt):
-		return 0
+	def forage(self, type_of_feed, plants):
+		if type_of_feed == "carnivore":
+			result = f"{self.name} war erfolglos bei der Jagd nach Pflanzen."
+			result += "Vielleicht sollte er als Fleischfresser bei der Fleischjagd bleiben."
+			return result
+		plant = random.choice(plants)
+		if plant.size != 0 and plant.population > 0:
+			match plant.type:
+				case "Baum":
+					if plant.fruit != 0:
+						plant.fruit -= 1
+						if self.hunger < 10:
+							self.hunger = 0
+						else:
+							self.hunger -= 10
+				case "Strauch":
+					for i in range(random.randint(1, plant.berry)):
+						plant.berry -= 1
+						self.hunger -= 2
+				case "Pilz":
+					plant.size -= 1
+					if plant.size == 0:
+						plant.population -= 1
+		else:
+			self.hunger += 5
 
 
-	def futtersuche(self, art_des_futters):
-		pass
+	def death(self):
+		if self.age == 0:
+			self.population -= 1
+		elif self.hunger == 100:
+			self.population -= 1
 
 
-	def sterben(self):
-		pass
+	def breed(self, population):
+		choice = random.choice([True, False])
+		if choice:
+			return population + random.randint(1, 5)
+		return population
 
 
-	def vermehren(self, population):
-		pass
+class Herbivore(Animal):
+	def __init__(self, name, population, age, hunger, health):
+		self.type_of_feed = "herbivore"
+		super().__init__(name, population, age, hunger, health)
 
 
-class Pflanzenfresser(Tier):
-	def __init__(self, population, alter, hunger, gesundheit, habitat):
-		self.art_des_futters = "vegan"
-		super().__init__(population, alter, hunger, gesundheit, habitat)
+class Carnivore(Animal):
+	def __init__(self, name, population, age, hunger, health):
+		self.type_of_feed = "carnivore"
+		super().__init__(name, population, age, hunger, health)
 
 
-class Fleischfresser(Tier):
-	def __init__(self, population, alter, hunger, gesundheit, habitat):
-		self.art_des_futters = "fleisch"
-		super().__init__(population, alter, hunger, gesundheit, habitat)
+	def hunt(self, potential_prey):
+		potential_prey = random.choice(potential_prey)
+		danger = 0
+		if potential_prey.type_of_feed == "herbivore":
+			if self.hunger < 50:
+				self.hunger = 0
+			else:
+				self.hunger -= 50
+			return potential_prey.population - 1
+		elif potential_prey.type_of_feed == "omnivore":
+			if self.name != potential_prey.name:
+				pass
+			else:
+				self.hunger -= 20
 
 
-	def jagen(self):
-		pass
-
-
-class Allesfresser(Pflanzenfresser, Fleischfresser):
-	def __init__(self, population, alter, hunger, gesundheit, habitat):
-		self.art_des_futters = "vollkost"
-		super().__init__(population, alter, hunger, gesundheit, habitat)
+class Omnivore(Herbivore, Carnivore):
+	def __init__(self, name, population, age, hunger, health):
+		self.type_of_feed = "omnivore"
+		super().__init__(name, population, age, hunger, health)
 
 
 
 class Habitat:
-	def __init__(self, verfuegbare_flaeche, pflanze, tier):
-		self.verfuegbare_flaeche = verfuegbare_flaeche
-		self.pflanze = pflanze
-		self.tier = tier
+	def __init__(self, available_space):
+		self.available_space = available_space
+		# animals
+		self.carnivores = []
+		self.herbivores = []
+		self.omnivores = []
+		# plants
+		self.trees = []
+		self.shrubs = []
+		self.mushrooms = []
 
 
-	def berechne_verfuegbare_flaeche(self, flaeche):
-		return flaeche
+	def get_initial_population(self, type_of_creature):
+		initial_available_space = self.available_space
+		if type_of_creature == "animal":
+			random.randint(1, 21)
+		elif type_of_creature == "plant":
+			if ((initial_available_space / 100) * 99) < self.available_space:
+				random.randint(1, 101)
+		else:
+			print("Unknown type of creature")
+
+
+	def generate_initial_life(self):
+		#TODO Flaechenberechnung
+		# initialisation of plants
+		population = self.get_initial_population("plant")
+		hazel = Tree("Hasselnussbaum", population, 1, 1, 300, 1, 0, 0)
+		population = self.get_initial_population("plant")
+		oak = Tree("Eiche", population, 1, 1, 1500, 3500, 0, 0)
+		population = self.get_initial_population("plant")
+		chestnut_tree = Tree("Kastanienbaum", population, 1, 1, 800, 3000, 0, 0)
+		population = self.get_initial_population("plant")
+		self.available_space -= population
+		chestnut_boletus = Mushroom("Maronen-Roehrling", population, 1, 1, 30, random.randint(1, 20))
+		population = self.get_initial_population("plant")
+		self.available_space -= population
+		chanterelle = Mushroom("Pfifferling", population, 1, 1, 8, random.randint(1, 20))
+		population = self.get_initial_population("plant")
+		self.available_space -= population
+		parasol_mushroom = Mushroom("Parasolpilz", population, 1, 1
+		, 35, random.randint(1, 20))
+		population = self.get_initial_population("plant")
+		blueberry_shrub = Shrub("Blaubeerstrauch", population, 10, 1, 200, 100)
+		population = self.get_initial_population("plant")
+		blackberry_shrub = Shrub("Brombeerstrauch", population, 10, 1, 200, 100)
+		population = self.get_initial_population("plant")
+		currants_shrub = Shrub("Johannisbeerstrauch", population, 10, 1, 200, 100)
+		plants = [
+			hazel, oak, chestnut_tree,
+			chestnut_boletus, chanterelle, parasol_mushroom,
+			blueberry_shrub, blackberry_shrub, currants_shrub
+			]
+		# initialisation of animals
+		# age is counted down
+		population = self.get_initial_population("animal")
+		wolf = Carnivore(population, 15, 0, 100)
+		population = self.get_initial_population("animal")
+		fox = Carnivore(population, 4, 0, 100)
+		population = self.get_initial_population("animal")
+		deer = Herbivore(population, 15, 0, 100)
+		population = self.get_initial_population("animal")
+		squirrel = Herbivore(population, 3, 0, 100)
+		population = self.get_initial_population("animal")
+		insects = Herbivore(population, 1, 0, 1000)
+		population = self.get_initial_population("animal")
+		mouse = Omnivore(population, 2, 0, 100)
+		population = self.get_initial_population("animal")
+		rat = Omnivore(population, 3, 0, 100)
+		population = self.get_initial_population("animal")
+		boar = Omnivore(population, 6, 0, 100)
+		animals = [wolf, fox, deer, squirrel, insects, mouse, rat, boar]
 
 
 class Main:
-	def __init__(self, habitat):
-		self.habitat = habitat
+	def __init__(self):
+		self.habitat = Habitat(random.randint(10000, 1000001))
 		self.aktueller_tag = 0
+
+
+	def simulate(self, days):
+		for i in range(days):
+			pass
 
 
 	def round(self, einheit):
 		days_to_simulate = 1
 		match einheit:
-			case "day":
+			case "t":
 				self.aktueller_tag += 1
 				print(f"Tag {self.aktueller_tag}")
-			case "week":
+			case "w":
 				days_to_simulate = 7
 				self.aktueller_tag += 7
 				print(f"Tag {self.aktueller_tag}")
-			case "month":
+			case "m":
 				days_to_simulate = 28
 				self.aktueller_tag += 28
 				print(f"Tag {self.aktueller_tag}")
-			case "season":
+			case "j":
 				days_to_simulate = 84
 				self.aktueller_tag += 84
+		self.simulate(days_to_simulate)
 
 
 	def main(self):
-		pass
+		self.habitat.generate_initial_life()
+		while True:
+			print("Wie viel Zeit soll eine Runde simulieren")
+			print("Auswahl:")
+			print("Tag | Woche | Monat | Jahreszeit")
+			print("Tag = t, Woche = w, Monat = m, Jahreszeit = j")
+			einheit = input("Eingabe: ")
+			print(einheit)
+			match einheit:
+				case "t" | "w" | "m" | "j":
+					break
+		self.round(einheit)
 
 
 if __name__ == "__main__":
