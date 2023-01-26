@@ -60,12 +60,9 @@ class Animal(Creature):
 
 
 	def forage(self, type_of_feed, plants):
-		if type_of_feed == "carnivore":
-			result = f"{self.name} war erfolglos bei der Jagd nach Pflanzen."
-			result += "Vielleicht sollte er als Fleischfresser bei der Fleischjagd bleiben."
-			return result
 		plant = random.choice(plants)
 		if plant.size != 0 and plant.population > 0:
+			print("success")
 			match plant.type:
 				case "Baum":
 					if plant.fruit != 0:
@@ -83,6 +80,7 @@ class Animal(Creature):
 					if plant.size == 0:
 						plant.population -= 1
 		else:
+			print("fail")
 			self.hunger += 5
 
 
@@ -114,18 +112,29 @@ class Carnivore(Animal):
 
 	def hunt(self, potential_prey):
 		potential_prey = random.choice(potential_prey)
-		danger = 0
-		if potential_prey.type_of_feed == "herbivore":
-			if self.hunger < 50:
-				self.hunger = 0
+		danger = random.randint(0, 101)
+		if danger > 0:
+			self.health -= danger
+			if self.health > 0:
+				if potential_prey.type_of_feed == "herbivore":
+					if self.hunger < 50:
+						self.hunger = 0
+					else:
+						self.hunger -= 50
+					return potential_prey.population - 1
+				else:
+					if self.name != potential_prey.name:
+						if self.hunger < 50:
+							self.hunger = 0
+						else:
+							self.hunger -= 50
+						return potential_prey.population - 1
+					else:
+						self.hunger -= 20
+						return potential_prey.population
 			else:
-				self.hunger -= 50
-			return potential_prey.population - 1
-		elif potential_prey.type_of_feed == "omnivore":
-			if self.name != potential_prey.name:
-				pass
-			else:
-				self.hunger -= 20
+				self.population -= 1
+				return potential_prey.population
 
 
 class Omnivore(Herbivore, Carnivore):
@@ -151,12 +160,13 @@ class Habitat:
 	def get_initial_population(self, type_of_creature):
 		initial_available_space = self.available_space
 		if type_of_creature == "animal":
-			random.randint(1, 21)
+			return random.randint(1, 21)
 		elif type_of_creature == "plant":
 			if ((initial_available_space / 100) * 99) < self.available_space:
-				random.randint(1, 101)
+				return random.randint(1, 101)
 		else:
 			print("Unknown type of creature")
+			return 0
 
 
 	def generate_initial_life(self):
@@ -184,7 +194,7 @@ class Habitat:
 		blackberry_shrub = Shrub("Brombeerstrauch", population, 10, 1, 200, 100)
 		population = self.get_initial_population("plant")
 		currants_shrub = Shrub("Johannisbeerstrauch", population, 10, 1, 200, 100)
-		plants = [
+		self.plants = [
 			hazel, oak, chestnut_tree,
 			chestnut_boletus, chanterelle, parasol_mushroom,
 			blueberry_shrub, blackberry_shrub, currants_shrub
@@ -192,22 +202,22 @@ class Habitat:
 		# initialisation of animals
 		# age is counted down
 		population = self.get_initial_population("animal")
-		wolf = Carnivore(population, 15, 0, 100)
+		wolf = Carnivore("Wolf", population, 15, 0, 100)
 		population = self.get_initial_population("animal")
-		fox = Carnivore(population, 4, 0, 100)
+		fox = Carnivore("Fuchs", population, 4, 0, 100)
 		population = self.get_initial_population("animal")
-		deer = Herbivore(population, 15, 0, 100)
+		deer = Herbivore("Reh", population, 15, 0, 100)
 		population = self.get_initial_population("animal")
-		squirrel = Herbivore(population, 3, 0, 100)
+		squirrel = Herbivore("Eichhoernchen", population, 3, 0, 100)
 		population = self.get_initial_population("animal")
-		insects = Herbivore(population, 1, 0, 1000)
+		insects = Herbivore("Insekten", population, 1, 0, 1000)
 		population = self.get_initial_population("animal")
-		mouse = Omnivore(population, 2, 0, 100)
+		mouse = Omnivore("Maus", population, 2, 0, 100)
 		population = self.get_initial_population("animal")
-		rat = Omnivore(population, 3, 0, 100)
+		rat = Omnivore("Ratte", population, 3, 0, 100)
 		population = self.get_initial_population("animal")
-		boar = Omnivore(population, 6, 0, 100)
-		animals = [wolf, fox, deer, squirrel, insects, mouse, rat, boar]
+		boar = Omnivore("Wildschwein", population, 6, 0, 100)
+		self.animals = [wolf, fox, deer, squirrel, insects, mouse, rat, boar]
 
 
 class Main:
@@ -243,7 +253,9 @@ class Main:
 
 	def main(self):
 		self.habitat.generate_initial_life()
-		while True:
+		print(self.habitat.plants)
+		self.habitat.animals[0].hunt(self.habitat.animals[1])
+		'''while True:
 			print("Wie viel Zeit soll eine Runde simulieren")
 			print("Auswahl:")
 			print("Tag | Woche | Monat | Jahreszeit")
@@ -254,7 +266,7 @@ class Main:
 				case "t" | "w" | "m" | "j":
 					break
 		self.round(einheit)
-
+'''
 
 if __name__ == "__main__":
 	main = Main()
