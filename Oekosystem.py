@@ -1,4 +1,4 @@
-__author__ = "7714256 Laterza"
+__author__ = "7714256 Laterza, 7729366 Lubinski"
 
 import random
 
@@ -238,9 +238,11 @@ class Main:
 		welcome_message += "Okay. Los geht's \n Das sind die Pflanzen bisher: \n"
 		print(welcome_message)
 		plants = self.habitat.plants
-		tree_attributes = ["name", "type", "anzahl", "minimale groesse", "maximale groesse", "hoehe", "blaetter", "fruechte"]
-		mushroom_attributes = ["name", "type", "anzahl", "minimale groesse", "maximale groesse", "sprossen"]
-		shrub_attributes = ["name", "type", "anzahl", "minimale groesse", "maximale groesse", "beeren"]
+		animals = self.habitat.animals
+		tree_attributes = ["name", "typ", "anzahl", "minimale groesse", "maximale groesse", "hoehe", "blaetter", "fruechte"]
+		mushroom_attributes = ["name", "typ", "anzahl", "minimale groesse", "maximale groesse", "sprossen"]
+		shrub_attributes = ["name", "typ", "anzahl", "minimale groesse", "maximale groesse", "beeren"]
+		animal_attributes = ["name", "typ", "anzahl", "maximales alter", "hunger", "gesundheit"]
 		for i in range(len(plants)):
 			plant_info = f"Name = {plants[i].name}\nTyp: {plants[i].type}\n"
 			plant_info += f"Anzahl: {plants[i].population}\nGroesse: {plants[i].size}\n"
@@ -261,7 +263,7 @@ class Main:
 			enter = input("Eingabe: ")
 			if enter == "j":
 				while True:
-					print("Was soll geandert werden?")
+					print("Was soll geaendert werden?")
 					enter = input("Eingabe: ")
 					enter = enter.lower()
 					if plants[i].type == "Baum":
@@ -275,34 +277,87 @@ class Main:
 							continue
 					match enter:
 						case "name":
-							plants[i].name = input("Aenderung: ")
-						case "type":
+							plants[i].name = input("Name: ")
+						case "typ":
 							while True:
-								enter = input("Aenderung: ")
+								enter = input("Typ: ")
 								if enter not in ["Baum", "Strauch", "Pilz"]:
 									continue
-								
-							plants[i].type = enter
+								plants[i].type = enter
+								break
 						case "anzahl":
-							plants[i].population = enter
+							while True:
+								enter = input("Anzahl: ")
+								if enter.isdigit():
+									plants[i].population = int(enter)
+									break
 						case "groesse":
-							plants[i].size = enter
+							while True:
+								enter = input("Groesse: ")
+								if enter.isdigit():
+									plants[i].size = int(enter)
+									break
 						case "minimale groesse":
-							plants[i].minimal_size = enter
+							while True:
+								enter = input("Minimale Groesse: ")
+								if enter.isdigit():
+									plants[i].minimal_size = int(enter)
 						case "maximale groesse":
-							plants[i].maximal_size = enter
+							while True:
+								enter = input("Maximale Groesse: ")
+								if enter.isdigit():
+									plants[i].maximal_size = enter
+									break
 						case "hoehe":
-							plants[i].height = enter
+							while True:
+								enter = input("Hoehe: ")
+								if enter.isdigit():
+									plants[i].height = enter
+									break
 						case "blaetter":
-							plants[i].leaves = enter
+							while True:
+								enter = input("Blaetter: ")
+								if enter.isdigit():
+									plants[i].leaves = enter
+									break
 						case "fruechte":
-							plants[i].fruit = enter
+							while True:
+								enter = input("Fuechte: ")
+								if enter.isdigit():
+									plants[i].fruit = enter
+									break
 						case "sprossen":
-							plants[i].spore = enter
+							while True:
+								enter = input("Sprossen: ")
+								if enter.isdigit():
+									plants[i].spore = enter
+									break
 						case "beeren":
-							plants[i].beeries = enter
+							while True:
+								enter = input("Beeren: ")
+								if enter.isdigit():
+									plants[i].beeries = enter
+									break
+					break
 			elif enter == "n":
 				print("ok")
+		"anzahl", "alter", "hunger", "gesundheit"
+		for i in range(len(animals)):
+			animal_info = f"Name: {animals[i].name}\nTyp: {animals[i].type_of_feed}\n"
+			animal_info += f"Anzahl: {animals[i].population}\nMaximales Alter"
+			animal_info += f"Hunger: {animals[i].hunger}\nGesundheit: {animals[i].health}"
+			print("Moechtest du irgendwas aendern?\nj | n")
+			enter = input("Eingabe: ")
+			if enter == "j":
+				while True:
+					print("Was soll geaendert werden?")
+					enter = input("Eingabe: ")
+					enter = enter.lower()
+					if enter not in animal_attributes:
+						continue
+					if enter == ""
+			elif enter == "n":
+				print ("ok")
 
 
 	def simulate(self, days):
