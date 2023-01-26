@@ -60,28 +60,27 @@ class Animal(Creature):
 
 
 	def forage(self, type_of_feed, plants):
-		plant = random.choice(plants)
-		if plant.size != 0 and plant.population > 0:
-			print("success")
-			match plant.type:
-				case "Baum":
-					if plant.fruit != 0:
-						plant.fruit -= 1
-						if self.hunger < 10:
-							self.hunger = 0
-						else:
-							self.hunger -= 10
-				case "Strauch":
-					for i in range(random.randint(1, plant.berry)):
-						plant.berry -= 1
-						self.hunger -= 2
-				case "Pilz":
-					plant.size -= 1
-					if plant.size == 0:
-						plant.population -= 1
-		else:
-			print("fail")
-			self.hunger += 5
+		if random.choice([True, True, True, False]):
+			plant = random.choice(plants)
+			if plant.size != 0 and plant.population > 0:
+				match plant.type:
+					case "Baum":
+						if plant.fruit != 0:
+							plant.fruit -= 1
+							if self.hunger < 10:
+								self.hunger = 0
+							else:
+								self.hunger -= 10
+					case "Strauch":
+						for i in range(random.randint(1, plant.berry)):
+							plant.berry -= 1
+							self.hunger -= 2
+					case "Pilz":
+						plant.size -= 1
+						if plant.size == 0:
+							plant.population -= 1
+			else:
+				self.hunger += 5
 
 
 	def death(self):
@@ -111,30 +110,33 @@ class Carnivore(Animal):
 
 
 	def hunt(self, potential_prey):
-		potential_prey = random.choice(potential_prey)
-		danger = random.randint(0, 101)
-		if danger > 0:
-			self.health -= danger
-			if self.health > 0:
-				if potential_prey.type_of_feed == "herbivore":
-					if self.hunger < 50:
-						self.hunger = 0
-					else:
-						self.hunger -= 50
-					return potential_prey.population - 1
-				else:
-					if self.name != potential_prey.name:
+		if random.choice([True, True, True, False]):
+			potential_prey = random.choice(potential_prey)
+			danger = random.randint(0, 101)
+			if danger > 0:
+				self.health -= danger
+				if self.health > 0:
+					if potential_prey.type_of_feed == "herbivore":
 						if self.hunger < 50:
 							self.hunger = 0
 						else:
 							self.hunger -= 50
 						return potential_prey.population - 1
 					else:
-						self.hunger -= 20
-						return potential_prey.population
-			else:
-				self.population -= 1
-				return potential_prey.population
+						if self.name != potential_prey.name:
+							if self.hunger < 50:
+								self.hunger = 0
+							else:
+								self.hunger -= 50
+							return potential_prey.population - 1
+						else:
+							self.hunger -= 20
+							return potential_prey.population
+				else:
+					self.population -= 1
+					return potential_prey.population
+		else:
+			return potential_prey.population
 
 
 class Omnivore(Herbivore, Carnivore):
@@ -226,6 +228,30 @@ class Main:
 		self.aktueller_tag = 0
 
 
+	def user_input_habitat(self):
+		welcome_message = "Herzlich willkomen zur Sandbox Lauf-der-Natur. " 
+		welcome_message += "Das gesammte Spiel ist fuer die Konsole ausgelegt. "
+		welcome_message += "Du hast jetzt die Moeglichkeit dein Habitat anzupassen "
+		welcome_message += "oder bei den Standardwerten zu bleiben. "
+		welcome_message += "Gerne darfst du auch das Habitat um weitere Tiere und "
+		welcome_message += "Pflanzen erweitern. \n\n"
+		welcome_message += "Okay. Los geht's \n Das sind die Pflanzen bisher: \n"
+		plants = self.habitat.plants
+		for i in range(plants):
+			plant_info = f"Name = {plants[i].name}\nTyp: {plants[i].type}\n"
+			plant_info += f"Anzahl: {plants[i].population}\nGroesse: {plants[i].sizes}\n"
+			plant_info += f"Minmale Groesse: {plants[i].minimal_size}\n"
+			plant_info += f"Maxmale Groesse: {plants[i].maximal_size}\n"
+			if plants[i].type == "Baum":
+				plant_info += f"Hoehe: {plants[i].height}\n"
+				plant_info += f"Blaetter: {plants[i].leaves}\n"
+				plant_info += f"Fruechte: {plants[i].fruit}\n"
+			elif plants[i].type == "Pilz":
+				plant_info += f"Sporen: {plants[i].spore}"
+			elif plants[i].type == "Strauch":
+				plant_info += f"Beeren: {plants[i].berries}"
+
+
 	def simulate(self, days):
 		for i in range(days):
 			pass
@@ -254,9 +280,9 @@ class Main:
 	def main(self):
 		self.habitat.generate_initial_life()
 		print(self.habitat.plants)
-		self.habitat.animals[0].hunt(self.habitat.animals[1])
-		'''while True:
-			print("Wie viel Zeit soll eine Runde simulieren")
+		self.habitat.animals[0].hunt(self.habitat.animals)
+		while True:
+			print("Wie viel Zeit soll eine Runde simulieren?")
 			print("Auswahl:")
 			print("Tag | Woche | Monat | Jahreszeit")
 			print("Tag = t, Woche = w, Monat = m, Jahreszeit = j")
@@ -266,7 +292,7 @@ class Main:
 				case "t" | "w" | "m" | "j":
 					break
 		self.round(einheit)
-'''
+
 
 if __name__ == "__main__":
 	main = Main()
