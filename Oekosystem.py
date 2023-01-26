@@ -236,10 +236,14 @@ class Main:
 		welcome_message += "Gerne darfst du auch das Habitat um weitere Tiere und "
 		welcome_message += "Pflanzen erweitern. \n\n"
 		welcome_message += "Okay. Los geht's \n Das sind die Pflanzen bisher: \n"
+		print(welcome_message)
 		plants = self.habitat.plants
-		for i in range(plants):
+		tree_attributes = ["name", "type", "anzahl", "minimale groesse", "maximale groesse", "hoehe", "blaetter", "fruechte"]
+		mushroom_attributes = ["name", "type", "anzahl", "minimale groesse", "maximale groesse", "sprossen"]
+		shrub_attributes = ["name", "type", "anzahl", "minimale groesse", "maximale groesse", "beeren"]
+		for i in range(len(plants)):
 			plant_info = f"Name = {plants[i].name}\nTyp: {plants[i].type}\n"
-			plant_info += f"Anzahl: {plants[i].population}\nGroesse: {plants[i].sizes}\n"
+			plant_info += f"Anzahl: {plants[i].population}\nGroesse: {plants[i].size}\n"
 			plant_info += f"Minmale Groesse: {plants[i].minimal_size}\n"
 			plant_info += f"Maxmale Groesse: {plants[i].maximal_size}\n"
 			if plants[i].type == "Baum":
@@ -247,9 +251,58 @@ class Main:
 				plant_info += f"Blaetter: {plants[i].leaves}\n"
 				plant_info += f"Fruechte: {plants[i].fruit}\n"
 			elif plants[i].type == "Pilz":
-				plant_info += f"Sporen: {plants[i].spore}"
+				plant_info += f"Sprossen: {plants[i].spore}"
 			elif plants[i].type == "Strauch":
 				plant_info += f"Beeren: {plants[i].berries}"
+			else:
+				print(f"{plants[i].type} ist nicht vorhanden")
+			print(plant_info)
+			print("Moechtest du irgendwas aendern?\nj | n")
+			enter = input("Eingabe: ")
+			if enter == "j":
+				while True:
+					print("Was soll geandert werden?")
+					enter = input("Eingabe: ")
+					enter = enter.lower()
+					if plants[i].type == "Baum":
+						if enter not in tree_attributes:
+							continue
+					elif plants[i].type == "Pilz":
+						if enter not in mushroom_attributes:
+							continue
+					elif plants[i].type == "Strauch":
+						if enter not in shrub_attributes:
+							continue
+					match enter:
+						case "name":
+							plants[i].name = input("Aenderung: ")
+						case "type":
+							while True:
+								enter = input("Aenderung: ")
+								if enter not in ["Baum", "Strauch", "Pilz"]:
+									continue
+								
+							plants[i].type = enter
+						case "anzahl":
+							plants[i].population = enter
+						case "groesse":
+							plants[i].size = enter
+						case "minimale groesse":
+							plants[i].minimal_size = enter
+						case "maximale groesse":
+							plants[i].maximal_size = enter
+						case "hoehe":
+							plants[i].height = enter
+						case "blaetter":
+							plants[i].leaves = enter
+						case "fruechte":
+							plants[i].fruit = enter
+						case "sprossen":
+							plants[i].spore = enter
+						case "beeren":
+							plants[i].beeries = enter
+			elif enter == "n":
+				print("ok")
 
 
 	def simulate(self, days):
@@ -279,6 +332,7 @@ class Main:
 
 	def main(self):
 		self.habitat.generate_initial_life()
+		self.user_input_habitat()
 		print(self.habitat.plants)
 		self.habitat.animals[0].hunt(self.habitat.animals)
 		while True:
